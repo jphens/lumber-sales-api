@@ -44,9 +44,17 @@ const TicketController = {
    */
   createTicket(req, res) {
     try {
+      console.log('Received ticket data:', req.body);
       const { id, customerName, customerPhone, date, total, items } = req.body;
 
       if (!id || !customerName || !date || !items || !Array.isArray(items)) {
+        console.log('Validation failed, missing required fields:', {
+          hasId: !!id,
+          hasCustomerName: !!customerName,
+          hasDate: !!date,
+          hasItems: !!items,
+          isItemsArray: Array.isArray(items)
+        });
         return res.status(400).json({ error: 'Missing required ticket information' });
       }
 

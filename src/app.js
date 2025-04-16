@@ -6,14 +6,23 @@ const routes = require('./routes');
 // Initialize the express app
 const app = express();
 
+// CORS configuration - allow requests from all origins (local network)
+app.use(cors({
+  origin: ['http://localhost:8080', 'http://127.0.0.1:8080', 'http://192.168.1.117:8080'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 // Middleware
-app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Request logger middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url} at ${new Date().toISOString()}`);
+  if (req.method === 'POST' || req.method === 'PUT') {
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+  }
   next();
 });
 
@@ -22,7 +31,7 @@ app.use('/api', routes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Error:', err.stack);
   res.status(500).json({
     error: 'Internal Server Error',
     message: process.env.NODE_ENV === 'development' ? err.message : undefined
